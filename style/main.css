@@ -5,11 +5,57 @@
 }
 
 html {
-    --font-family: 'Lato', sans-serif
+    --font-family: 'Lato', sans-serif;
+    --background-color: #fefefe;
+    --text-color: #282828;
+    --accent-color: #ffc579;
 }
 
 body {
     font-family: var(--font-family);
     background: #333;
     color: #fff;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app {
+    position: relative;
+    border: 1px solid #aaa;
+    width: 400px;
+    height: 300px;
+}
+
+.app__header {
+    position: relative;
+    padding: 15px;
+    padding-left: 60px;
+    background: var(--text-color);
+}
+
+.app__body {
+    position: relative;
+}
+
+.app__decorator {
+    position: absolute;
+    top: 0;
+    left: 40px;
+    width: 7px;
+    height: 100%;
+    border-left: 1px solid;
+    border-right: 1px solid;
+}
+
+.app__decorator--header {
+    border-color: var(--background-color);
+}
+
+.app__decorator--body {
+    border-color: var(--accent-color);
 }
