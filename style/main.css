@@ -51,6 +51,7 @@ input {
 }
 
 .app__decorator {
+    z-index: 10;
     position: absolute;
     top: 0;
     left: 40px;
@@ -77,6 +78,7 @@ input {
     align-items: center;
     border-top: 1px solid var(--border-color);
     transition: .25s ease-in-out;
+    background: var(--background-color);
 }
 
 .task__checkbox,
@@ -90,6 +92,11 @@ input {
 .task__checkbox input,
 .add-task__btn {
     cursor: pointer;
+    color: var(--text-complete);
+}
+
+.add-task__btn {
+    font-weight: 700;
 }
 
 .task__content,

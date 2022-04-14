@@ -1,25 +1,18 @@
 const taskDiv = document.querySelector('.tasks')
-const taskList = document.querySelectorAll('.task')
 const newTaskBtn = document.querySelector('.add-task__btn')
+const localTasks = {...localStorage}
+let lastID
 
-// Adds task
-const addTask = () => {
-    const newTaskInput = document.querySelector('#add-task__input')
 
-    // Validate
-    if (newTaskInput.value == '') {
-        newTaskInput.placeholder = 'Musisz wpisać treść zadania!'
-        return
-    }
-
+const createTaskElement = (id, taskContent, isCompleted) => {
     // Create HTML elements
     const newTaskCheckbox = document.createElement('div')
     newTaskCheckbox.classList.add('task__checkbox')
-    newTaskCheckbox.innerHTML = '<input type="checkbox">'
+    newTaskCheckbox.innerHTML = `<input type="checkbox" ${isCompleted && 'checked'}>`
 
     const newTaskContent = document.createElement('div')
     newTaskContent.classList.add('task__content')
-    newTaskContent.textContent = newTaskInput.value
+    newTaskContent.textContent = taskContent
 
     const newTaskDeleteBtn = document.createElement('div')
     newTaskDeleteBtn.classList.add('task__delete')
@@ -27,6 +20,8 @@ const addTask = () => {
 
     const newTask = document.createElement('div')
     newTask.classList.add('task')
+    newTask.id = id
+    newTask.setAttribute('draggable', 'true')
     newTask.appendChild(newTaskCheckbox)
     newTask.appendChild(newTaskContent)
     newTask.appendChild(newTaskDeleteBtn)
@@ -34,28 +29,65 @@ const addTask = () => {
     // Add functions to new task
     taskFunctions(newTask)
 
-    // Add task to site
+    // Add element to site
     taskDiv.appendChild(newTask)
+}
+
+
+// Adds task
+const addTask = () => {
+    const newTaskInput = document.querySelector('#add-task__input')
+    const newTaskContent = newTaskInput.value
+
+    // Validate
+    if (newTaskContent == '') {
+        newTaskInput.placeholder = 'Musisz wpisać treść zadania!'
+        return
+    }
+
+    // Clear input
+    newTaskInput.value = ''
+
+    const Task = {
+        taskContent: newTaskContent,
+        isCompleted: false
+    }
+
+    lastID++
+    createTaskElement(lastID, newTaskContent, false)
+
+    localStorage.setItem(lastID, JSON.stringify(Task))
 }
 
 
 // Deletes task
 const deleteTask = e => {
     const task = e.target.closest('.task')
+    const taskID = task.id
+
     task.remove()
+    localStorage.removeItem(taskID)
 }
 
 
-const taskStatus = e => {
-    const task = e.target.closest('.task')
-    const taskCheckbox = e.target
+const taskStatusStyle = (id, isCompleted) => {
+    const task = document.getElementById(id)
+    if (isCompleted) { task.classList.add('task--complete') }
+    else { task.classList.remove('task--complete') }
+}
 
-    if (taskCheckbox.checked) {
-        task.classList.add('task--complete')
-    }
-    else {
-        task.classList.remove('task--complete')
-    }
+
+const taskStatusChange = e => {
+    const task = e.target.closest('.task')
+    const taskID = task.id
+    const isCompleted = e.target.checked
+
+    taskStatusStyle(taskID, isCompleted)
+
+    Task = JSON.parse(localStorage.getItem(taskID))
+    Task.isCompleted = isCompleted
+
+    localStorage.setItem(taskID, JSON.stringify(Task))
 }
 
 
@@ -65,13 +97,28 @@ const taskFunctions = e => {
     const taskCheckbox = task.querySelector('.task__checkbox > input')
     const taskDeleteBtn = task.querySelector('.task__delete')
 
-    taskCheckbox.addEventListener('click', taskStatus)
+    taskCheckbox.addEventListener('click', taskStatusChange)
     taskDeleteBtn.addEventListener('click', deleteTask)
 }
 
 
-taskList.forEach(e => {
-    taskFunctions(e)
-})
+// Load tasks from local storage
+const loadTasks = () => {
+    let Task
 
-newTaskBtn.addEventListener('click', addTask)
+    let keys = Object.keys(localStorage);
+    lastID = Math.max(...keys)
+
+    for (let key of keys) {
+        Task = JSON.parse(localStorage.getItem(key))
+        createTaskElement(key, Task.taskContent, Task.isCompleted)
+        taskStatusStyle(key, Task.isCompleted)
+    }
+}
+
+loadTasks()
+
+document.addEventListener('DOMContentLoaded', () => {
+    newTaskBtn.addEventListener('click', addTask)
+    
+})
