@@ -7,14 +7,21 @@
 html {
     --font-family: 'Lato', sans-serif;
     --background-color: #fefefe;
-    --text-color: #282828;
-    --accent-color: #ffc579;
+    --text-color: #2e3641;
+    --accent-color: #ffb06f;
+    --border-color: #929292;
+
+    --text-complete: #9eb2c0;
 }
 
 body {
     font-family: var(--font-family);
     background: #333;
     color: #fff;
+}
+
+input {
+    font-family: var(--font-family);
 }
 
 .container {
@@ -26,9 +33,9 @@ body {
 
 .app {
     position: relative;
-    border: 1px solid #aaa;
+    border: 1px solid var(--border-color);
     width: 400px;
-    height: 300px;
+    background: var(--background-color);
 }
 
 .app__header {
@@ -40,22 +47,84 @@ body {
 
 .app__body {
     position: relative;
+    color: var(--text-color);
 }
 
 .app__decorator {
     position: absolute;
     top: 0;
     left: 40px;
-    width: 7px;
+    width: 5px;
     height: 100%;
     border-left: 1px solid;
     border-right: 1px solid;
 }
 
 .app__decorator--header {
-    border-color: var(--background-color);
+    border-color: var(--border-color);
 }
 
 .app__decorator--body {
     border-color: var(--accent-color);
+}
+
+.task,
+.add-task {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    transition: .25s ease-in-out;
+}
+
+.task__checkbox,
+.add-task__btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.task__checkbox input,
+.add-task__btn {
+    cursor: pointer;
+}
+
+.task__content,
+.add-task__content {
+    margin-left: 20px;
+}
+
+.task__delete {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.add-task__content > input {
+    background: transparent;
+    border: none;
+    width: 300px;
+
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.add-task__content > input:focus {
+    outline: none;
+}
+
+.task--complete {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    color: var(--text-complete);
+    transition: .25s ease-in-out;
+}
+
+.task--complete .task__delete {
+    opacity: .3;
 }
