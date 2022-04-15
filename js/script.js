@@ -1,5 +1,6 @@
-const taskDiv = document.querySelector('.tasks')
+const taskContainer = document.querySelector('.tasks')
 const newTaskBtn = document.querySelector('.add-task__btn')
+const newTaskInput = document.querySelector('#add-task__input')
 const localTasks = {...localStorage}
 let lastID
 
@@ -30,13 +31,12 @@ const createTaskElement = (id, taskContent, isCompleted) => {
     taskFunctions(newTask)
 
     // Add element to site
-    taskDiv.appendChild(newTask)
+    taskContainer.appendChild(newTask)
 }
 
 
 // Adds task
 const addTask = () => {
-    const newTaskInput = document.querySelector('#add-task__input')
     const newTaskContent = newTaskInput.value
 
     // Validate
@@ -99,26 +99,79 @@ const taskFunctions = e => {
 
     taskCheckbox.addEventListener('click', taskStatusChange)
     taskDeleteBtn.addEventListener('click', deleteTask)
+
+    // Allow dragging
+    task.addEventListener('dragstart', () => {
+        task.classList.add('dragging')
+    })
+
+    task.addEventListener('dragend', () => {
+        task.classList.remove('dragging')
+    })
 }
 
 
 // Load tasks from local storage
 const loadTasks = () => {
     let Task
-
     let keys = Object.keys(localStorage);
     lastID = Math.max(...keys)
 
-    for (let key of keys) {
+    // Sort keys
+    keys = keys.map(key => {
+        return parseInt(key)
+    })
+    keys.sort((a,b) => {
+        return a-b
+    })
+
+    // Add tasks to container
+    keys.forEach(key => {
         Task = JSON.parse(localStorage.getItem(key))
         createTaskElement(key, Task.taskContent, Task.isCompleted)
         taskStatusStyle(key, Task.isCompleted)
-    }
+    })
 }
 
-loadTasks()
-
 document.addEventListener('DOMContentLoaded', () => {
+    loadTasks()
     newTaskBtn.addEventListener('click', addTask)
-    
+    newTaskInput.addEventListener("keyup", e => {
+        // Check if key is ENTER
+        if (e.keyCode === 13) {
+          addTask()
+        }
+    })
 })
+
+
+
+// Dragging tasks
+taskContainer.addEventListener('dragover', e => {
+    e.preventDefault()
+    const afterElement = getDragAfterElement(taskContainer, e.clientY)
+    const draggable = document.querySelector('.dragging')
+    if (afterElement != null) {
+        taskContainer.insertBefore(draggable, afterElement)
+    }
+})
+
+const getDragAfterElement = (container, y) => {
+    const allTasks = [...container.querySelectorAll('.task:not(.dragging)')]
+
+    return allTasks.reduce((closest, child) => {
+        const box = child.getBoundingClientRect()
+        const offset = y - box.top - box.height / 2
+        
+        if (offset < 0 && offset > closest.offset) {
+            return {
+                offset: offset,
+                element: child
+            }
+        }
+        else {
+            return closest
+        }
+        
+    }, { offset: Number.NEGATIVE_INFINITY }).element
+} 

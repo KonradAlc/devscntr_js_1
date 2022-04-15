@@ -81,6 +81,11 @@ input {
     background: var(--background-color);
 }
 
+.task.dragging {
+    background: #f1f1f1;
+    opacity: .5;
+}
+
 .task__checkbox,
 .add-task__btn {
     display: flex;
@@ -97,6 +102,11 @@ input {
 
 .add-task__btn {
     font-weight: 700;
+    transition: .25s;
+}
+
+.add-task__btn:hover {
+    color: var(--accent-color);
 }
 
 .task__content,
