@@ -2,7 +2,48 @@ const taskContainer = document.querySelector('.tasks')
 const newTaskBtn = document.querySelector('.add-task__btn')
 const newTaskInput = document.querySelector('#add-task__input')
 const localTasks = {...localStorage}
+let idList = []
 let lastID
+
+
+const swap = (a, b) => {
+    let temp = a
+    a = b
+    b = temp
+    return [...a, b]
+}
+
+
+const getFreeID = () => {
+    idList.sort()
+    idList.sort((a,b) => {
+        return a-b
+    })
+
+    let id
+    for (id = 0; id < idList.length; id++) {
+        if (id != idList[id]) {
+            return id
+        }
+    }
+    return id
+}
+
+
+const swapTask = (task1, task2) => {
+    let id1 = task1.id
+    let id2 = task2.id
+
+    const task1obj = JSON.parse(localStorage.getItem(id1))
+    const task2obj = JSON.parse(localStorage.getItem(id2))
+
+    localStorage.setItem(id2, JSON.stringify(task1obj))
+    localStorage.setItem(id1, JSON.stringify(task2obj))
+
+    const temp = task1.id
+    task1.id = task2.id
+    task2.id = temp
+}
 
 
 const createTaskElement = (id, taskContent, isCompleted) => {
@@ -53,10 +94,12 @@ const addTask = () => {
         isCompleted: false
     }
 
-    lastID++
+    id = getFreeID()
     createTaskElement(lastID, newTaskContent, false)
 
-    localStorage.setItem(lastID, JSON.stringify(Task))
+    idList.push(id)
+
+    localStorage.setItem(id, JSON.stringify(Task))
 }
 
 
@@ -105,7 +148,10 @@ const taskFunctions = e => {
         task.classList.add('dragging')
     })
 
-    task.addEventListener('dragend', () => {
+    task.addEventListener('dragend', e => {
+        const afterElement = getDragAfterElement(taskContainer, e.clientY)
+        if (afterElement != null) { swapTask(task, afterElement) }
+
         task.classList.remove('dragging')
     })
 }
@@ -124,6 +170,7 @@ const loadTasks = () => {
     keys.sort((a,b) => {
         return a-b
     })
+    idList = keys
 
     // Add tasks to container
     keys.forEach(key => {
@@ -143,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 })
-
 
 
 // Dragging tasks
@@ -174,4 +220,4 @@ const getDragAfterElement = (container, y) => {
         }
         
     }, { offset: Number.NEGATIVE_INFINITY }).element
-} 
+}
